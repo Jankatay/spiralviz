@@ -1,11 +1,9 @@
 use std::io;
 
-pub mod spiralviz;
-use spiralviz::CsvIterator;
+pub mod parser;
+use parser::csv_to_table;
 
 fn main() -> io::Result<()> {
-    let mut csv_iterator = CsvIterator::new("./GLB.Ts+dSST.csv")?;
-    for elem in csv_iterator {
-    }
+    csv_to_table("./GLB.Ts+dSST.csv")?;
     Ok(())
 }
