@@ -1,6 +1,10 @@
 use std::fs;
 use std::io;
 
+pub mod opts {
+    pub static CRLF_ENFORCED: bool = false; // True => Do not accept LF at end instead of CRLF
+}
+
 pub type Table = Vec<Vec<String>>;
 
 // Open a csv file and return the table
@@ -93,6 +97,7 @@ fn parse_record(token_stream: &Vec<Token>, index: &mut usize) -> Option<Vec<Stri
     
     // *(COMMA field)
     while let Some(Token::COMMA) = token_stream.get(i) {
+        i += 1;
         ret.push(parse_field(token_stream, &mut i)?);
     }
 
@@ -128,6 +133,7 @@ fn parse_escaped(token_stream: &Vec<Token>, index: &mut usize) -> Option<String>
 
     // DQUOTE
     if !matches!( token_stream.get(i), Some(Token::DQUOTE)) { return None; }
+    i += 1;
 
     // *(TEXTDATA / COMMA / CR / LF / 2DQUOTE) 
     loop {
@@ -151,6 +157,7 @@ fn parse_escaped(token_stream: &Vec<Token>, index: &mut usize) -> Option<String>
 
     // DQUOTE
     if !matches!(token_stream.get(i), Some(Token::DQUOTE)) { return None; }
+    i += 1;
 
     // Success
     *index = i;
@@ -175,13 +182,17 @@ fn parse_non_escaped(token_stream: &Vec<Token>, index: &mut usize) -> Option<Str
 // CRLF -> CR LF
 fn parse_crlf(token_stream: &Vec<Token>, index: &mut usize) -> Option<()> {
     // init
-    let i = *index;
+    let mut i = *index;
     
     // CR
-    if !matches!(token_stream.get(i), Some(Token::CR)) { return None; }
+    if opts::CRLF_ENFORCED {
+        if !matches!(token_stream.get(i), Some(Token::CR)) { return None; }
+        i += 1;
+    }
 
     // LF
-    if !matches!(token_stream.get(i+1), Some(Token::LF)) { return None; }
+    if !matches!(token_stream.get(i), Some(Token::LF)) { return None; }
+    i += 1;
     
     // success
     *index = i;
