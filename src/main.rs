@@ -1,9 +1,9 @@
 use std::io;
 
-pub mod parser;
-use parser::csv_to_table;
+pub mod csv_parser;
+use csv_parser::csv_open;
 
 fn main() -> io::Result<()> {
-    csv_to_table("./GLB.Ts+dSST.csv")?;
+    csv_open("./GLB.Ts+dSST.csv")?;
     Ok(())
 }
