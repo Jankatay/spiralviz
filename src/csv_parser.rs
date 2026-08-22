@@ -25,7 +25,9 @@ pub fn csv_open(filepath: &str) -> io::Result<Table> {
 }
 
 /* Tokenizing and Parsing functions below.
- * reference - https://datatracker.ietf.org/doc/html/rfc4180 */
+ * reference - https://datatracker.ietf.org/doc/html/rfc4180 
+ * I am aware that there is WAY simpler way to parse a csv file,
+ * but I wanted to learn by practice how proper ABNF to parser conversion is done*/
 
 // ommiting redundant tokens
 #[derive(Debug)]
@@ -144,10 +146,9 @@ fn parse_escaped(token_stream: &Vec<Token>, index: &mut usize) -> Option<String>
             Token::LF => ret.push('\n'),            // LF
             Token::DQUOTE => {                      // 2DQUOTE (ensure not 1)
                 if let Some(Token::DQUOTE) = token_stream.get(i+1) {
+                    ret.push('\"');
                     i += 1;
-                    ret.push('\"')
                 } else {
-                    i -= 1;
                     break;
                 }
             }
