@@ -1,5 +1,4 @@
-use std::fs;
-use std::io;
+use std::{fs, io};
 
 pub mod opts {
     pub static CRLF_ENFORCED: bool = false; // True => Do not accept LF at end instead of CRLF
@@ -186,8 +185,9 @@ fn parse_crlf(token_stream: &Vec<Token>, index: &mut usize) -> Option<()> {
     let mut i = *index;
     
     // CR
-    if opts::CRLF_ENFORCED {
-        if !matches!(token_stream.get(i), Some(Token::CR)) { return None; }
+    if !matches!(token_stream.get(i), Some(Token::CR)) { 
+        if opts::CRLF_ENFORCED { return None; }
+    } else {
         i += 1;
     }
 
